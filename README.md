@@ -8,11 +8,13 @@ There's a new Word every day.
 The project uses ZKSnarks and on-chain proof verification.
 
 ## TODO
-- [ ] Add a script to generate word bytes
-- [ ] Add scripts to work with Zokrates from nodejs env + interact with the contract
-- [ ] Fix tests to work with Verifier
-- [ ] Extend the documentation
+- [x] Add a script to generate word bytes
+- [x] Add scripts to work with Zokrates from nodejs env + interact with the contract
+- [x] Fix tests to work with Verifier
+- [ ] Deploy metadata server
 - [ ] Deploy to testnets
+- [ ] Create simple one-page POC UI
+- [ ] Extend the documentation
 
 ### Zokrates usage
 
