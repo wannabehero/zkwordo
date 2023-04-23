@@ -11,7 +11,7 @@ The project uses ZKSnarks and on-chain proof verification.
 - [x] Add a script to generate word bytes
 - [x] Add scripts to work with Zokrates from nodejs env + interact with the contract
 - [x] Fix tests to work with Verifier
-- [ ] Deploy metadata server
+- [x] Deploy metadata server
 - [ ] Deploy to testnets
 - [ ] Create simple one-page POC UI
 - [ ] Extend the documentation

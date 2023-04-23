@@ -11,3 +11,5 @@ artifacts
 
 circuits/*
 !circuits/*.zok
+
+.DS_Store
