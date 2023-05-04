@@ -1,4 +1,6 @@
+import * as fs from "fs";
 import { createHash } from "crypto";
+import { ethers } from "hardhat";
 import { initialize } from "zokrates-js";
 
 function createCircuit(words: string[]) {
@@ -18,6 +20,20 @@ function createCircuit(words: string[]) {
   return { source, encoded };
 }
 
+async function selialize() {
+  const { verifier, artifacts } = await generateCircuit(["foo", "bar", "kek"]);
+
+  if (!fs.existsSync("./artifacts/zk")) {
+    fs.mkdirSync("./artifacts/zk", { recursive: true });
+  }
+
+  fs.writeFileSync("./artifacts/zk/Verifier.sol", verifier);
+  fs.writeFileSync("./artifacts/zk/program.json", JSON.stringify({
+    program: [...artifacts.program],
+    abi: artifacts.abi,
+  }));
+}
+
 export async function generateCircuit(words: string[]) {
   const provider = await initialize();
 
@@ -28,3 +44,8 @@ export async function generateCircuit(words: string[]) {
   const verifier = provider.exportSolidityVerifier(keypair.vk);
   return { verifier, keypair, artifacts, encoded, provider };
 }
+
+selialize().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
