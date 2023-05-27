@@ -9,7 +9,7 @@ import {
   safeWallet,
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
-import { configureChains, createClient } from 'wagmi';
+import { configureChains, createConfig } from 'wagmi';
 import { polygonMumbai } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
@@ -17,9 +17,9 @@ import { publicProvider } from 'wagmi/providers/public';
 const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY ?? '';
 const WC_PROJECT_ID = import.meta.env.VITE_WC_PROJECT_ID ?? '';
 
-export const { chains, provider } = configureChains(
+export const { chains, publicClient } = configureChains(
   [polygonMumbai],
-  [publicProvider(), alchemyProvider({ apiKey: ALCHEMY_KEY })],
+  [alchemyProvider({ apiKey: ALCHEMY_KEY }), publicProvider()],
 );
 
 const connectors = connectorsForWallets([
@@ -36,8 +36,8 @@ const connectors = connectorsForWallets([
   },
 ]);
 
-export const wagmiClient = createClient({
-  provider,
-  connectors,
+export const wagmiConfig = createConfig({
   autoConnect: true,
+  connectors,
+  publicClient
 });

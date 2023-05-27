@@ -1,21 +1,21 @@
 import './polyfills';
 import './index.css'
-import { ChakraProvider } from '@chakra-ui/react'
-import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
+import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { WagmiConfig } from 'wagmi'
 import App from './App.tsx'
-import { chains, wagmiClient } from './web/wallet.ts'
+
+const theme = extendTheme({
+  config: {
+    initialColorMode: 'system',
+    useSystemColorMode: false,
+  },
+});
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <ChakraProvider>
-      <WagmiConfig client={wagmiClient}>
-        <RainbowKitProvider chains={chains}>
-          <App />
-        </RainbowKitProvider>
-      </WagmiConfig>
+    <ChakraProvider theme={theme}>
+      <App />
     </ChakraProvider>
   </React.StrictMode>,
 )
