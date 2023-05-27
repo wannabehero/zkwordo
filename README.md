@@ -12,44 +12,38 @@ The project uses ZKSnarks and on-chain proof verification.
 - [x] Add scripts to work with Zokrates from nodejs env + interact with the contract
 - [x] Fix tests to work with Verifier
 - [x] Deploy metadata server
+- [x] Migrate from zokrates to snarkjs
 - [ ] Deploy to testnets
 - [ ] Create simple one-page POC UI
 - [ ] Extend the documentation
 
-### Zokrates usage
+## Snarks
 
-Refer to https://zokrates.github.io/gettingstarted.html to install zokrates.
+Install circom https://docs.circom.io/getting-started/installation/#installing-circom
 
-At the time of writing it's:
 ```sh
-curl -LSfs get.zokrat.es | sh
-```
+cd snarks
 
-Then do the following:
-```sh
-cd circuits
+# compile the circuit
+circom words.circom --r1cs --wasm --sym
 
-# update the words in zkwordo.zok first
-# it's sha256 bytes of the word
+# ptau phases
+npx snarkjs powersoftau new bn128 14 pot14_0000.ptau -v
+npx snarkjs powersoftau contribute pot14_0000.ptau pot14_0001.ptau --name="ZKWordo" -v
+npx snarkjs powersoftau beacon pot14_0001.ptau pot14_beacon.ptau RANDOM_HEX_NUMBER_OF_62_LEN 10 -n="Final"
+npx snarkjs powersoftau prepare phase2 pot14_beacon.ptau pot14_final.ptau -v
 
-# 1. compile the circuit
-zokrates compile -i zkwordo.zok
+# export r1cs
+npx snarkjs r1cs export json words.r1cs words.r1cs.json
 
-# 2. run setup
-zokrates setup
+# setup plonk verification
+npx snarkjs plonk setup words.r1cs pot14_final.ptau words_plonk.zkey
 
-# 3. compute the witness
-zokrates compute-witness -a 43 59 24 18 9 36 29 63 60 194 251 50 66 138 45 68 44 187 130 101 88 152 145 219 232 210 248 87 44 208 142 191 0 1390849295786071768276380950238675083608645509734
-# first goes sha256 bytes (all 32 of them) of the word, then day number, then uint(your-wallet-address)
+# export the verification key
+npx snarkjs zkey export verificationkey words_plonk.zkey verification_key.json
 
-# 4. generate the proof
-zokrates generate-proof
-
-# 5. export the solidity verifier
-zokrates export-verifier
-
-# at this point you want to replace the Verifier with yours
-mv verifier.sol ../contracts/Verifier.sol
+# export the verifier
+npx snarkjs zkey export solidityverifier words_plonk.zkey ../contracts/PlonkVerifier.sol
 ```
 
 Then proceed normally.

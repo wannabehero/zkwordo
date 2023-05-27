@@ -1,93 +1,24 @@
 import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-// @ts-expect-error no typesdev for solc
-import solc from "solc";
-import { CompilationArtifacts, SetupKeypair, ZoKratesProvider } from "zokrates-js";
-
-import { generateCircuit } from "../scripts/circuit";
-
-interface ZK {
-  provider: ZoKratesProvider;
-  artifacts: CompilationArtifacts;
-  encoded: Buffer[];
-  keypair: SetupKeypair;
-}
 
 describe("ZKWordo", function () {
-  const words = [
-    "hello",
-    "world"
-  ];
-
   async function deployVerifierFixture() {
-    const [signer] = await ethers.getSigners();
-
-    const { verifier: verifierSrc, provider, artifacts, encoded, keypair } = await generateCircuit(words);
-    const { contracts } = JSON.parse(
-      solc.compile(JSON.stringify({
-        language: "Solidity",
-        sources: {
-          "Verifier.sol": {
-            content: verifierSrc
-          }
-        },
-        settings: {
-          outputSelection: {
-            "*": {
-              "*": ["*"]
-            }
-          }
-        }
-      }))
-    );
-
-    const compiled = contracts["Verifier.sol"]["Verifier"];
-
-    const Verifier = new ethers.ContractFactory(
-      compiled.abi,
-      contracts["Verifier.sol"]["Verifier"].evm.bytecode,
-      signer
-    );
-
+    const Verifier = await ethers.getContractFactory("MockVerifier");
     const verifier = await Verifier.deploy();
     return {
       verifier,
-      zk: {
-        provider,
-        artifacts,
-        encoded,
-        keypair
-      }
     };
   }
 
   async function deployZKWordoFixture() {
-    const { verifier, zk } = await loadFixture(deployVerifierFixture);
+    const { verifier } = await loadFixture(deployVerifierFixture);
 
     const [signer, another] = await ethers.getSigners();
     const ZKWordo = await ethers.getContractFactory("ZKWordo");
     const zkWordo = await ZKWordo.deploy(verifier.address);
 
-    return { zkWordo, signer, zk, another };
-  }
-
-  function generateProof(zk: ZK, day: number, account: string) {
-    const { witness } = zk.provider.computeWitness(
-      zk.artifacts,
-      [
-        [...zk.encoded[day]].map((n) => n.toString()),
-        day.toString(),
-        ethers.BigNumber.from(account).toString()
-      ]
-    );
-    const { proof } = zk.provider.generateProof(
-      zk.artifacts.program,
-      witness,
-      zk.keypair.pk
-    );
-
-    return proof as any;
+    return { zkWordo, signer, another };
   }
 
   describe("Deployment", function () {
@@ -115,9 +46,9 @@ describe("ZKWordo", function () {
 
   describe("Validations", function () {
     it("Should revert if the wrong price", async function () {
-      const { zkWordo, zk, signer } = await loadFixture(deployZKWordoFixture);
+      const { zkWordo } = await loadFixture(deployZKWordoFixture);
 
-      const proof = generateProof(zk, 0, signer.address);
+      const proof = ethers.utils.toUtf8Bytes("test");
 
       await expect(
         zkWordo.guess(
@@ -130,9 +61,9 @@ describe("ZKWordo", function () {
     });
 
     it("Should revert for the second guess", async function () {
-      const { zkWordo, zk, signer } = await loadFixture(deployZKWordoFixture);
+      const { zkWordo } = await loadFixture(deployZKWordoFixture);
 
-      const proof = generateProof(zk, 0, signer.address);
+      const proof = ethers.utils.toUtf8Bytes("test");
 
       await zkWordo.guess(
         proof,
@@ -154,9 +85,9 @@ describe("ZKWordo", function () {
 
   describe("Guessing", function () {
     it("Should mint a token for that day guess", async function () {
-      const { zkWordo, zk, signer } = await loadFixture(deployZKWordoFixture);
+      const { zkWordo, signer } = await loadFixture(deployZKWordoFixture);
 
-      const proof0 = generateProof(zk, 0, signer.address);
+      const proof0 = ethers.utils.toUtf8Bytes("test");
 
       await zkWordo.guess(
         proof0,
@@ -167,24 +98,26 @@ describe("ZKWordo", function () {
 
       expect(await zkWordo.balanceOf(signer.address, 0)).to.equal(1);
 
-      await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 24 * 60 * 60));
+      await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 48 * 60 * 60));
 
-      const proof1 = generateProof(zk, 1, signer.address);
+      const proof2 = ethers.utils.toUtf8Bytes("test");
 
       await zkWordo.guess(
-        proof1,
+        proof2,
         {
           value: ethers.utils.parseEther("0.01")
         }
       );
 
-      expect(await zkWordo.balanceOf(signer.address, 1)).to.equal(1);
+      expect(await zkWordo.balanceOf(signer.address, 2)).to.equal(1);
     });
 
-    it("Should not mint a token for the wrong guesser", async function () {
-      const { zkWordo, zk, signer, another } = await loadFixture(deployZKWordoFixture);
+    it("Should not mint a token for bad proof", async function () {
+      const { zkWordo, another } = await loadFixture(deployZKWordoFixture);
 
-      const proof = generateProof(zk, 0, signer.address);
+      const proof = ethers.utils.toUtf8Bytes("test");
+      // mock fails for day = 1
+      await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 24 * 60 * 60));
 
       await zkWordo.connect(another).guess(
         proof,
@@ -199,9 +132,9 @@ describe("ZKWordo", function () {
 
   describe("Events", function () {
     it("Should emit a GuessedCorrectly event", async function () {
-      const { zkWordo, zk, signer } = await loadFixture(deployZKWordoFixture);
+      const { zkWordo, signer } = await loadFixture(deployZKWordoFixture);
 
-      const proof = generateProof(zk, 0, signer.address);
+      const proof = ethers.utils.toUtf8Bytes("test");
 
       await expect(zkWordo.guess(
         proof,
@@ -212,27 +145,29 @@ describe("ZKWordo", function () {
     });
 
     it("Should emit a GuessedIncorrectly event", async function () {
-      const { zkWordo, zk, signer, another } = await loadFixture(deployZKWordoFixture);
+      const { zkWordo, another } = await loadFixture(deployZKWordoFixture);
 
-      const proof = generateProof(zk, 0, signer.address);
+      const proof = ethers.utils.toUtf8Bytes("test");
+      // mock fails for day = 1
+      await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 24 * 60 * 60));
 
       await expect(zkWordo.connect(another).guess(
         proof,
         {
           value: ethers.utils.parseEther("0.01")
         }
-      )).to.emit(zkWordo, "GuessedIncorrectly").withArgs(another.address, 0);
+      )).to.emit(zkWordo, "GuessedIncorrectly").withArgs(another.address, 1);
     });
   });
 
   describe("Withdrawal", function () {
     it("Should withdraw correctly", async function () {
-      const { zkWordo, zk, signer } = await loadFixture(deployZKWordoFixture);
+      const { zkWordo, signer } = await loadFixture(deployZKWordoFixture);
 
-      const proof0 = generateProof(zk, 0, signer.address);
+      const proof = ethers.utils.toUtf8Bytes("test");
 
       await zkWordo.guess(
-        proof0,
+        proof,
         {
           value: ethers.utils.parseEther("0.01")
         }

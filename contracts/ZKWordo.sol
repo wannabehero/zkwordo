@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-import "./Verifier.sol";
+import "./interfaces/IVerifier.sol";
 
 contract ZKWordo is ERC1155, Ownable {
     event GuessedCorrectly(address indexed user, uint256 day);
@@ -15,9 +15,9 @@ contract ZKWordo is ERC1155, Ownable {
 
     uint256 private _guessPrice = 0.01 ether;
 
-    Verifier private _verifier;
+    IVerifier private _verifier;
 
-    constructor(Verifier verifier_)
+    constructor(IVerifier verifier_)
         ERC1155("https://api.zkwordo.xyz/api/metadata/token/")
         Ownable()
     {
@@ -37,14 +37,20 @@ contract ZKWordo is ERC1155, Ownable {
         return _guessPrice;
     }
 
-    function guess(Verifier.Proof calldata proof) external payable returns (bool) {
+    function guess(bytes calldata proof) external payable returns (bool) {
         require(msg.value == _guessPrice, "ZKWordo: guess price mismatch");
         uint256 day = (block.timestamp - _createdAt) / 1 days;
         require(balanceOf(_msgSender(), day) == 0, "ZKWordo: already guessed today");
 
-        uint[3] memory input = [day, uint160(_msgSender()), uint160(_msgSender())];
+        uint160 nSender = uint160(_msgSender());
 
-        if (!_verifier.verifyTx(proof, input)) {
+        uint[] memory input = new uint[](4);
+        input[0] = 32;
+        input[1] = nSender;
+        input[2] = day;
+        input[3] = nSender;
+
+        if (!_verifier.verifyProof(proof, input)) {
             emit GuessedIncorrectly(_msgSender(), day);
             return false;
         }

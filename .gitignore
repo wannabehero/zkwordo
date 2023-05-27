@@ -9,7 +9,7 @@ typechain-types
 cache
 artifacts
 
-circuits/*
-!circuits/*.zok
+snarks/*
+!snarks/*.gpg
 
 .DS_Store

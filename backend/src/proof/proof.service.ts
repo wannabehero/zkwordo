@@ -1,35 +1,43 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
-import { CompilationArtifacts, ZoKratesProvider } from 'zokrates-js';
-import { ARTIFACTS, PROVIDER } from './consts';
+import * as snarkjs from 'snarkjs';
 
 @Injectable()
 export class ProofService {
-  private readonly privateKey: Uint8Array;
   private readonly logger = new Logger(ProofService.name);
 
-  constructor(
-    @Inject(ARTIFACTS) private readonly artifacts: CompilationArtifacts,
-    @Inject(PROVIDER) private readonly provider: ZoKratesProvider,
-  ) {
-    this.privateKey = this.provider.setup(this.artifacts.program).pk;
-  }
+  constructor(private readonly config: ConfigService) {}
 
-  private prepareWord(word: string): string[] {
+  private prepareWord(word: string): number[] {
     const hashed = createHash('sha256').update(word).digest();
-    return [...hashed].map((n) => n.toString());
+    return [...hashed];
   }
 
   async generateProof(account: string, word: string, day: number): Promise<object> {
     this.logger.log(`Generating proof for ${account} on day ${day} with word ${word}`);
 
-    const { witness } = this.provider.computeWitness(this.artifacts, [
-      this.prepareWord(word),
-      day.toString(),
-      BigInt(account).toString(),
-    ]);
+    const guess = this.prepareWord(word);
+    this.logger.debug(`Guess: ${guess}`);
 
-    const { proof } = this.provider.generateProof(this.artifacts.program, witness, this.privateKey);
-    return proof;
+    const payload = {
+      day,
+      guess,
+      addressIn: BigInt(account).toString(),
+    };
+
+    const { proof, publicSignals } = await snarkjs.plonk.fullProve(
+      payload,
+      this.config.get('ZK_WASM_PATH') ?? '../snarks/words.wasm',
+      this.config.get('ZK_ZKEY_PATH') ?? '../snarks/words_plonk.zkey',
+    );
+
+    const calldata: string = await snarkjs.plonk.exportSolidityCallData(proof, publicSignals);
+
+    const [, ...params] = calldata.match(/^(0x[\w]+),(\[.+\])$/);
+
+    return {
+      proof: params[0],
+    };
   }
 }
