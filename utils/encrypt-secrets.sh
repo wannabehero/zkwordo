@@ -4,6 +4,7 @@
 files_to_encrypt=(
     'snarks/words.wasm'
     'snarks/words_plonk.zkey'
+    'data/words.json'
 )
 
 # encrypt files from array

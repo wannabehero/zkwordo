@@ -37,26 +37,34 @@ contract ZKWordo is ERC1155, Ownable {
         return _guessPrice;
     }
 
+    function createdAt() external view returns (uint256) {
+        return _createdAt;
+    }
+
+    function day() public view returns (uint256) {
+        return (block.timestamp - _createdAt) / 1 days;
+    }
+
     function guess(bytes calldata proof) external payable returns (bool) {
         require(msg.value == _guessPrice, "ZKWordo: guess price mismatch");
-        uint256 day = (block.timestamp - _createdAt) / 1 days;
-        require(balanceOf(_msgSender(), day) == 0, "ZKWordo: already guessed today");
+        uint256 today = day();
+        require(balanceOf(_msgSender(), today) == 0, "ZKWordo: already guessed today");
 
         uint160 nSender = uint160(_msgSender());
 
         uint[] memory input = new uint[](4);
         input[0] = 32;
         input[1] = nSender;
-        input[2] = day;
+        input[2] = today;
         input[3] = nSender;
 
         if (!_verifier.verifyProof(proof, input)) {
-            emit GuessedIncorrectly(_msgSender(), day);
+            emit GuessedIncorrectly(_msgSender(), today);
             return false;
         }
 
-        _mint(_msgSender(), day, 1, "");
-        emit GuessedCorrectly(_msgSender(), day);
+        _mint(_msgSender(), today, 1, "");
+        emit GuessedCorrectly(_msgSender(), today);
 
         return true;
     }

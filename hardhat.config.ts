@@ -21,6 +21,9 @@ const config: HardhatUserConfig = {
       url: "https://rpc.public.zkevm-test.net",
       accounts: [process.env.PRIVATE_KEY!]
     },
+    local: {
+      url: "http://127.0.0.1:8545",
+    }
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_KEY,

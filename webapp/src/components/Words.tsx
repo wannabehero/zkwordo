@@ -15,15 +15,10 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { useState } from 'react';
-
-interface Word {
-  id: number;
-  word: string;
-  guessed: boolean;
-}
+import { Word } from '../types/word';
 
 interface WordsProps {
-  words: Word[];
+  words: Word[] | null;
 }
 
 const Words = ({ words }: WordsProps) => {
@@ -33,28 +28,35 @@ const Words = ({ words }: WordsProps) => {
     <>
       <VStack align="stretch">
         <Text fontSize="lg">Previous words</Text>
-        <VStack align="stretch">
-          {words.map((word, idx) => (
-            <Card key={`card-word-${idx}`}
-              _hover={{ opacity: 0.8, cursor: 'pointer' }}
-              onClick={() => setOpenWord(word)}
-            >
-              <CardBody>
-                <Flex align="center">
-                  <Text>{word.word}</Text>
-                  <Spacer />
-                  {
-                    word.guessed ? (
-                      <CheckIcon color="green.500" />
-                    ) : (
-                      <CloseIcon color="red.500" />
-                    )
-                  }
-                </Flex>
-              </CardBody>
-            </Card>
-          ))}
-        </VStack>
+        {
+          words && (
+            <VStack align="stretch">
+              {words.map((word, idx) => (
+                <Card key={`card-word-${idx}`}
+                  _hover={{ opacity: 0.8, cursor: 'pointer' }}
+                  onClick={() => setOpenWord(word)}
+                >
+                  <CardBody>
+                    <Flex align="center">
+                      <Text>{word.word}</Text>
+                      <Spacer />
+                      {
+                        word.guessed === true && (
+                          <CheckIcon color="green.500" />
+                        )
+                      }
+                      {
+                        word.guessed === false && (
+                          <CloseIcon color="red.500" />
+                        )
+                      }
+                    </Flex>
+                  </CardBody>
+                </Card>
+              ))}
+            </VStack>
+          )
+        }
       </VStack>
       <Modal isOpen={openWord !== null} onClose={() => setOpenWord(null)}>
         <ModalOverlay />

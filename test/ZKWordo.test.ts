@@ -44,6 +44,27 @@ describe("ZKWordo", function () {
     });
   });
 
+  describe("Views", function () {
+    it("Should return the right created time", async function () {
+      const ts = Math.floor(new Date().getTime() / 1000) + 60;
+      await time.setNextBlockTimestamp(ts);
+
+      const { zkWordo } = await loadFixture(deployZKWordoFixture);
+
+      expect(await zkWordo.createdAt()).to.be.approximately(ts, 100);
+    });
+
+    it("Should return the current day", async function () {
+      const { zkWordo } = await loadFixture(deployZKWordoFixture);
+
+      expect(await zkWordo.day()).to.equal(0);
+
+      await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 48 * 60 * 60));
+
+      expect(await zkWordo.day()).to.equal(2);
+    });
+  });
+
   describe("Validations", function () {
     it("Should revert if the wrong price", async function () {
       const { zkWordo } = await loadFixture(deployZKWordoFixture);

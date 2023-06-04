@@ -13,3 +13,6 @@ snarks/*
 !snarks/*.gpg
 
 .DS_Store
+
+data/*
+!data/*.gpg
