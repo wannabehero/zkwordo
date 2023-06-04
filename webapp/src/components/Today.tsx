@@ -1,9 +1,10 @@
-import { Alert, Button, HStack, Input, Link, Text, VStack, } from '@chakra-ui/react';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { Alert, Button, HStack, Input, Link, Text, VStack } from '@chakra-ui/react';
 import { useCallback, useState } from 'react';
 import { formatEther } from 'viem';
-import { getExplorerTokenURL } from '../web3/utils';
-import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { useWalletClient } from 'wagmi';
+
+import { getExplorerTokenURL } from '../web3/utils';
 
 interface TodayProps {
   day: number;
@@ -29,48 +30,44 @@ const Today = ({ day, hint, price, currency, onGuess, didGuess, isLoading }: Tod
 
   return (
     <VStack align="stretch">
-      {
-        didGuess && (
-          <Alert status='success' variant='solid' borderRadius='md' justifyContent='center'>
-            <Link href={getExplorerTokenURL(day)} isExternal>
-              You've guessed today's word! 🎉
-              <ExternalLinkIcon mx='4px' />
-            </Link>
-          </Alert>
-        )
-      }
-      {
-        !didGuess && (
-          <>
-            <Text fontSize="lg">Day #{day}</Text>
-            {
-              hint && (
-                <Text fontSize="md" color="gray.400">Hint: {hint}</Text>
-              )
-            }
-            <HStack>
-              <Input
-                placeholder="Word..."
-                value={word}
-                onChange={(e) => setWord(e.target.value.toLowerCase())}
-              />
-              <Button
-                onClick={onClick}
-                colorScheme="orange"
-                isLoading={isLoading}
-                isDisabled={word.length === 0 || wallet === undefined}
-              >
-                Guess
-              </Button>
-            </HStack>
-            <Text fontSize="xs" alignSelf="flex-end" color="gray.600">
-              Guess price: {formatEther(price)} {currency}
+      {didGuess && (
+        <Alert status="success" variant="solid" borderRadius="md" justifyContent="center">
+          <Link href={getExplorerTokenURL(day)} isExternal>
+            You&apos;ve guessed today&apos;s word! 🎉
+            <ExternalLinkIcon mx="4px" />
+          </Link>
+        </Alert>
+      )}
+      {!didGuess && (
+        <>
+          <Text fontSize="lg">Day #{day}</Text>
+          {hint && (
+            <Text fontSize="md" color="gray.400">
+              Hint: {hint}
             </Text>
-          </>
-        )
-      }
+          )}
+          <HStack>
+            <Input
+              placeholder="Word..."
+              value={word}
+              onChange={(e) => setWord(e.target.value.toLowerCase())}
+            />
+            <Button
+              onClick={onClick}
+              colorScheme="orange"
+              isLoading={isLoading}
+              isDisabled={word.length === 0 || wallet === undefined}
+            >
+              Guess
+            </Button>
+          </HStack>
+          <Text fontSize="xs" alignSelf="flex-end" color="gray.600">
+            Guess price: {formatEther(price)} {currency}
+          </Text>
+        </>
+      )}
     </VStack>
   );
-}
+};
 
 export default Today;

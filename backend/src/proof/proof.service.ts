@@ -3,8 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
 import * as snarkjs from 'snarkjs';
 import { Address, PublicClient, recoverTypedDataAddress } from 'viem';
-import { WordsService } from '../words/words.service';
+
 import { VIEM_CLIENT } from '../web3/consts';
+import { WordsService } from '../words/words.service';
 
 @Injectable()
 export class ProofService {

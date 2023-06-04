@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import * as path from 'path';
 import { Canvas, CanvasRenderingContext2D, createCanvas, loadImage, registerFont } from 'canvas';
+import * as path from 'path';
 
 @Injectable()
 export class ImageService {

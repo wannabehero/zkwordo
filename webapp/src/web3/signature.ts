@@ -1,12 +1,6 @@
 import { ZKWORDO_CONTRACT } from './const';
 
-export function createTypedData({
-  chainId,
-  word,
-}: {
-  chainId: number;
-  word: string;
-}) {
+export function createTypedData({ chainId, word }: { chainId: number; word: string }) {
   return {
     domain: {
       chainId,
@@ -15,13 +9,11 @@ export function createTypedData({
       verifyingContract: ZKWORDO_CONTRACT,
     },
     types: {
-      Guess: [
-        { name: 'word', type: 'string' }
-      ],
+      Guess: [{ name: 'word', type: 'string' }],
     },
     primaryType: 'Guess',
     message: {
-      word
-    }
+      word,
+    },
   } as const;
 }

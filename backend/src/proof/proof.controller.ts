@@ -1,7 +1,8 @@
 import { Body, Controller, HttpException, Post, UseGuards } from '@nestjs/common';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { ProofService } from './proof.service';
 import { Address } from 'viem';
+
+import { ProofService } from './proof.service';
 
 @UseGuards(ThrottlerGuard)
 @Controller('proof')

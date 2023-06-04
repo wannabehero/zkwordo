@@ -1,7 +1,8 @@
-import { ConfigService } from '@nestjs/config';
 import { Global, Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createPublicClient, http } from 'viem';
-import { polygonMumbai, hardhat } from 'viem/chains';
+import { hardhat, polygonMumbai } from 'viem/chains';
+
 import { VIEM_CLIENT } from './consts';
 
 @Global()

@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Address, PublicClient } from 'viem';
-import { ORDERED_WORDS } from './consts';
-import { zkWordoABI } from '../web3/contracts';
-import { WordsList } from './types';
+
 import { VIEM_CLIENT } from '../web3/consts';
+import { zkWordoABI } from '../web3/contracts';
+import { ORDERED_WORDS } from './consts';
+import { WordsList } from './types';
 
 @Injectable()
 export class WordsService {

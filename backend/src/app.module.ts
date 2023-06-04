@@ -1,12 +1,13 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MetadataModule } from './metadata/metadata.module';
-import { ImageModule } from './image/image.module';
-import { ProofModule } from './proof/proof.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+
+import { ImageModule } from './image/image.module';
+import { MetadataModule } from './metadata/metadata.module';
 import { LoggerMiddleware } from './middlewares/LoggerMiddleware';
-import { WordsModule } from './words/words.module';
+import { ProofModule } from './proof/proof.module';
 import { Web3Module } from './web3/web3.module';
+import { WordsModule } from './words/words.module';
 
 @Module({
   imports: [

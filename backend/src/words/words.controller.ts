@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
-import { WordsService } from './words.service';
+
 import { WordsList } from './types';
+import { WordsService } from './words.service';
 
 @Controller('words')
 export class WordsController {
