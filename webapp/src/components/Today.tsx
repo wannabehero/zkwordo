@@ -1,6 +1,9 @@
-import { Alert, Button, HStack, Input, Text, VStack, } from '@chakra-ui/react';
+import { Alert, Button, HStack, Input, Link, Text, VStack, } from '@chakra-ui/react';
 import { useCallback, useState } from 'react';
 import { formatEther } from 'viem';
+import { getExplorerTokenURL } from '../web3/utils';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { useWalletClient } from 'wagmi';
 
 interface TodayProps {
   day: number;
@@ -16,6 +19,8 @@ interface TodayProps {
 const Today = ({ day, hint, price, currency, onGuess, didGuess, isLoading }: TodayProps) => {
   const [word, setWord] = useState('');
 
+  const { data: wallet } = useWalletClient();
+
   const onClick = useCallback(async () => {
     if (await onGuess(word)) {
       setWord('');
@@ -27,8 +32,10 @@ const Today = ({ day, hint, price, currency, onGuess, didGuess, isLoading }: Tod
       {
         didGuess && (
           <Alert status='success' variant='solid' borderRadius='md' justifyContent='center'>
-            You've guessed today's word! 🎉
-            <br/># TODO: add link to NFT
+            <Link href={getExplorerTokenURL(day)} isExternal>
+              You've guessed today's word! 🎉
+              <ExternalLinkIcon mx='4px' />
+            </Link>
           </Alert>
         )
       }
@@ -51,7 +58,7 @@ const Today = ({ day, hint, price, currency, onGuess, didGuess, isLoading }: Tod
                 onClick={onClick}
                 colorScheme="orange"
                 isLoading={isLoading}
-                isDisabled={word.length === 0}
+                isDisabled={word.length === 0 || wallet === undefined}
               >
                 Guess
               </Button>

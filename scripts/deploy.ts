@@ -5,7 +5,7 @@ async function deploy() {
   const verifier = await Verifier.deploy();
 
   const ZKWordo = await ethers.getContractFactory("ZKWordo");
-  const zkWordo = await ZKWordo.deploy(verifier.address);
+  const zkWordo = await ZKWordo.deploy(verifier.address, 64);
 
   await zkWordo.deployed();
 

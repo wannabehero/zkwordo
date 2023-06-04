@@ -18,7 +18,7 @@ const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY ?? '';
 const WC_PROJECT_ID = import.meta.env.VITE_WC_PROJECT_ID ?? '';
 
 export const { chains, publicClient } = configureChains(
-  [hardhat, polygonMumbai],
+  [hardhat, /*polygonMumbai*/],
   [alchemyProvider({ apiKey: ALCHEMY_KEY }), publicProvider()],
 );
 

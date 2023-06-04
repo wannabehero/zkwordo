@@ -11,18 +11,19 @@ contract ZKWordo is ERC1155, Ownable {
     event GuessedCorrectly(address indexed user, uint256 day);
     event GuessedIncorrectly(address indexed user, uint256 day);
 
+    uint256 private immutable _maxWords;
     uint256 private immutable _createdAt;
-
     uint256 private _guessPrice = 0.01 ether;
 
     IVerifier private _verifier;
 
-    constructor(IVerifier verifier_)
+    constructor(IVerifier verifier_, uint256 maxWords_)
         ERC1155("https://api.zkwordo.xyz/api/metadata/token/")
         Ownable()
     {
         _createdAt = block.timestamp;
         _verifier = verifier_;
+        _maxWords = maxWords_;
     }
 
     function contractURI() public pure returns (string memory) {
@@ -45,9 +46,14 @@ contract ZKWordo is ERC1155, Ownable {
         return (block.timestamp - _createdAt) / 1 days;
     }
 
+    function maxWords() external view returns (uint256) {
+        return _maxWords;
+    }
+
     function guess(bytes calldata proof) external payable returns (bool) {
         require(msg.value == _guessPrice, "ZKWordo: guess price mismatch");
         uint256 today = day();
+        require(today < _maxWords, "ZKWordo: all words guessed");
         require(balanceOf(_msgSender(), today) == 0, "ZKWordo: already guessed today");
 
         uint160 nSender = uint160(_msgSender());

@@ -7,7 +7,7 @@ import { getOpenedWords } from "../api";
 
 const useWords = () => {
   const [apiWords, setApiWords] = useState<Word[]>([]);
-  const [words, setWords] = useState<Word[]>([]);
+  const [words, setWords] = useState<Word[]>();
   const { address } = useAccount();
   const client = usePublicClient();
   const [balances, setBalances] = useState<bigint[]>([]);
@@ -39,9 +39,6 @@ const useWords = () => {
   }, [setApiWords]);
 
   useEffect(() => {
-    if ((!balances.length && address) || !apiWords.length) {
-      return;
-    }
     setWords(apiWords.map((word, idx) => ({
       ...word,
       guessed: address ? balances[idx] > 0 : undefined

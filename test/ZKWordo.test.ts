@@ -16,7 +16,7 @@ describe("ZKWordo", function () {
 
     const [signer, another] = await ethers.getSigners();
     const ZKWordo = await ethers.getContractFactory("ZKWordo");
-    const zkWordo = await ZKWordo.deploy(verifier.address);
+    const zkWordo = await ZKWordo.deploy(verifier.address, 4);
 
     return { zkWordo, signer, another };
   }
@@ -54,12 +54,18 @@ describe("ZKWordo", function () {
       expect(await zkWordo.createdAt()).to.be.approximately(ts, 100);
     });
 
+    it("Should return max words", async function () {
+      const { zkWordo } = await loadFixture(deployZKWordoFixture);
+
+      expect(await zkWordo.maxWords()).to.equal(4);
+    });
+
     it("Should return the current day", async function () {
       const { zkWordo } = await loadFixture(deployZKWordoFixture);
 
       expect(await zkWordo.day()).to.equal(0);
 
-      await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 48 * 60 * 60));
+      await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 49 * 60 * 60));
 
       expect(await zkWordo.day()).to.equal(2);
     });
@@ -79,6 +85,23 @@ describe("ZKWordo", function () {
           }
         )
       ).to.be.revertedWith("ZKWordo: guess price mismatch");
+    });
+
+    it("Should revert if no words left", async function () {
+      const { zkWordo } = await loadFixture(deployZKWordoFixture);
+
+      const proof = ethers.utils.toUtf8Bytes("test");
+
+      await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 97 * 60 * 60));
+
+      await expect(
+        zkWordo.guess(
+          proof,
+          {
+            value: ethers.utils.parseEther("0.01")
+          }
+        )
+      ).to.be.revertedWith("ZKWordo: all words guessed");
     });
 
     it("Should revert for the second guess", async function () {

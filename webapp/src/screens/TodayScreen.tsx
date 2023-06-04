@@ -1,7 +1,7 @@
 import { Address, useAccount, useChainId, usePublicClient, useSignTypedData } from 'wagmi';
 import Today from '../components/Today';
 import Words from '../components/Words';
-import { useZkWordoDay, useZkWordoGuess, useZkWordoGuessPrice, zkWordoABI } from '../web3/contracts';
+import { useZkWordoDay, useZkWordoGuess, useZkWordoGuessPrice, useZkWordoMaxWords, zkWordoABI } from '../web3/contracts';
 import { useCallback, useEffect, useState } from 'react';
 import { ZKWORDO_CONTRACT } from '../web3/const';
 import { generateSignedProof } from '../api';
@@ -9,9 +9,10 @@ import { ErrorResponse, ProofResponse } from '../api/types';
 import { useAddRecentTransaction } from '@rainbow-me/rainbowkit';
 import useWords from '../hooks/useWords';
 import useHint from '../hooks/useHint';
-import { useToast } from '@chakra-ui/react';
+import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Alert, Box, Highlight, Link, Stack, Text, useToast } from '@chakra-ui/react';
 import { createTypedData } from '../web3/signature';
 import { TransactionExecutionError } from 'viem';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
 
 const TodayScreen = () => {
   const [proof, setProof] = useState<Address>();
@@ -35,6 +36,9 @@ const TodayScreen = () => {
   const { data: day } = useZkWordoDay({
     address: ZKWORDO_CONTRACT,
   });
+  const { data: maxWords } = useZkWordoMaxWords({
+    address: ZKWORDO_CONTRACT,
+  })
 
   const chainId = useChainId();
 
@@ -104,31 +108,93 @@ const TodayScreen = () => {
       hash: tx.hash,
       description: 'Guessing'
     });
-    // TODO: reload words
     setDidGuess(true);
     toast({
       title: 'Awesome!',
-      description: 'You\'ve guessed the today\'s word and has been rewarded with an NFT!',
+      description: 'You\'ve guessed the today\'s word and has been rewarded!',
       status: 'success',
     });
     reset();
   }, [tx, addRecentTransaction, reset, toast]);
 
   return (
-    <>
-      <Today
-        currency="MATIC"
-        didGuess={didGuess}
-        day={Number(day ?? 0)}
-        hint={hint}
-        price={price ?? BigInt(0)}
-        onGuess={onGuess}
-        isLoading={status === 'loading'}
-      />
+    <Stack spacing={4}>
+      <Stack spacing={4}>
+        <Text fontSize='lg'>
+          ZKWordo — is a ZKP-based word guessing game.
+        </Text>
+        <Accordion allowToggle>
+          <AccordionItem>
+            <h2>
+              <AccordionButton>
+                <Box as="span" flex='1' textAlign='left'>
+                  How it works?
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </h2>
+            <AccordionPanel pb={4}>
+              <Stack spacing={2}>
+                <Text>
+                  <Highlight query='guess the word' styles={{ px: '1', py: '1', bg: 'teal.300' }}>
+                    Every day there's a new word to guess. There's also a hint to help you guess the word.
+                    Words are primarily aroung the crypto and web3 ecosystem.
+                  </Highlight>
+                </Text>
+                <Text>
+                  <Highlight query='sign a message' styles={{ px: '1', py: '1', bg: 'orange.300' }}>
+                    To submit a guess, you need to sign a message with your wallet. This is required to
+                    prove that you're the one who guessed the word.
+                  </Highlight>
+                </Text>
+                <Text>
+                  <Highlight query={['ZK proof', 'submit']} styles={{ px: '1', py: '1', bg: 'red.300' }}>
+                    If the word is guessed correctly the ZK proof will be generated that you submit to the
+                    smart contract.
+                  </Highlight>
+                </Text>
+                <Text>
+                  <Highlight query={'rewarded with an NFT'} styles={{ px: '1', py: '1', bg: 'green.300' }}>
+                    If the proof is valid, you'll be rewarded with an NFT, proving that you guessed the word.
+                  </Highlight>
+                </Text>
+                <Text>
+                  There's a <b>symbolic</b> payment required to submit a guess.
+                </Text>
+                <Text>
+                  The project source code is fully{' '}
+                  <Link href='https://github.com/wannabehero/zkwordo'>
+                    open-sourced.<ExternalLinkIcon mx='4px' />
+                  </Link>
+                </Text>
+              </Stack>
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
+      </Stack>
+      {
+        day && maxWords && day === maxWords
+        ? (
+          <Alert status="info" borderRadius='md'>
+            No more words left to guess this season. Please wait for the next season to start.
+          </Alert>
+        )
+        : (
+          <Today
+            currency="MATIC"
+            didGuess={didGuess}
+            day={Number(day ?? 0)}
+            hint={hint}
+            price={price ?? BigInt(0)}
+            onGuess={onGuess}
+            isLoading={status === 'loading'}
+          />
+        )
+      }
       <Words
         words={words}
       />
-    </>
+    </Stack>
   );
 }
 

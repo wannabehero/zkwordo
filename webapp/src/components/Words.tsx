@@ -1,5 +1,6 @@
 import { CheckIcon, CloseIcon, } from '@chakra-ui/icons';
 import {
+  Alert,
   Card,
   CardBody,
   Flex,
@@ -18,7 +19,7 @@ import { useState } from 'react';
 import { Word } from '../types/word';
 
 interface WordsProps {
-  words: Word[] | null;
+  words: Word[] | undefined;
 }
 
 const Words = ({ words }: WordsProps) => {
@@ -30,31 +31,39 @@ const Words = ({ words }: WordsProps) => {
         <Text fontSize="lg">Previous words</Text>
         {
           words && (
-            <VStack align="stretch">
-              {words.map((word, idx) => (
-                <Card key={`card-word-${idx}`}
-                  _hover={{ opacity: 0.8, cursor: 'pointer' }}
-                  onClick={() => setOpenWord(word)}
-                >
-                  <CardBody>
-                    <Flex align="center">
-                      <Text>{word.word}</Text>
-                      <Spacer />
-                      {
-                        word.guessed === true && (
-                          <CheckIcon color="green.500" />
-                        )
-                      }
-                      {
-                        word.guessed === false && (
-                          <CloseIcon color="red.500" />
-                        )
-                      }
-                    </Flex>
-                  </CardBody>
-                </Card>
-              ))}
-            </VStack>
+            words.length > 0
+            ? (
+              <VStack align="stretch">
+                {words.map((word, idx) => (
+                  <Card key={`card-word-${idx}`}
+                    _hover={{ opacity: 0.8, cursor: 'pointer' }}
+                    onClick={() => setOpenWord(word)}
+                  >
+                    <CardBody>
+                      <Flex align="center">
+                        <Text>{word.word}</Text>
+                        <Spacer />
+                        {
+                          word.guessed === true && (
+                            <CheckIcon color="green.500" />
+                          )
+                        }
+                        {
+                          word.guessed === false && (
+                            <CloseIcon color="red.500" />
+                          )
+                        }
+                      </Flex>
+                    </CardBody>
+                  </Card>
+                ))}
+              </VStack>
+            )
+            : (
+              <Alert status='info' variant='subtle' borderRadius='md' justifyContent='center'>
+                Today's the first day! Words from previous days will appear here.
+              </Alert>
+            )
           )
         }
       </VStack>

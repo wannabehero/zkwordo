@@ -28,7 +28,7 @@ export class WordsService {
 
   async getOpenedWords(): Promise<WordsList> {
     const currentDay = await this.getCurrentDay();
-    return this.wordsList.slice(0, Number(currentDay) + 1);
+    return this.wordsList.slice(0, Number(currentDay));
   }
 
   async getTodayHint(): Promise<string> {
