@@ -2,8 +2,8 @@
 # usage: ./encrypt-secrets.sh <passphrase>
 
 files_to_encrypt=(
-    'snarks/words.wasm'
-    'snarks/words_plonk.zkey'
+    'snarks/zkwordo.wasm'
+    'snarks/zkwordo_plonk.zkey'
     'data/words.json'
 )
 

@@ -1,9 +1,10 @@
-import { ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
-import { WordsService } from './words.service';
-import { WordsController } from './words.controller';
+
 import { ORDERED_WORDS } from './consts';
+import { WordsController } from './words.controller';
+import { WordsService } from './words.service';
 
 @Module({
   providers: [
@@ -19,6 +20,6 @@ import { ORDERED_WORDS } from './consts';
     WordsService,
   ],
   controllers: [WordsController],
-  exports: [WordsService],
+  exports: [WordsService, ORDERED_WORDS],
 })
 export class WordsModule {}

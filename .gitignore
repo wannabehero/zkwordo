@@ -11,6 +11,7 @@ artifacts
 
 snarks/*
 !snarks/*.gpg
+!snarks/*.circom
 
 .DS_Store
 

@@ -25,25 +25,25 @@ Install circom https://docs.circom.io/getting-started/installation/#installing-c
 cd snarks
 
 # compile the circuit
-circom words.circom --r1cs --wasm --sym
+circom zkwordo.circom --r1cs --wasm --sym
 
 # ptau phases
-npx snarkjs powersoftau new bn128 14 pot14_0000.ptau -v
+npx snarkjs powersoftau new bn128 15 pot14_0000.ptau -v
 npx snarkjs powersoftau contribute pot14_0000.ptau pot14_0001.ptau --name="ZKWordo" -v
 npx snarkjs powersoftau beacon pot14_0001.ptau pot14_beacon.ptau RANDOM_HEX_NUMBER_OF_62_LEN 10 -n="Final"
 npx snarkjs powersoftau prepare phase2 pot14_beacon.ptau pot14_final.ptau -v
 
 # export r1cs
-npx snarkjs r1cs export json words.r1cs words.r1cs.json
+npx snarkjs r1cs export json zkwordo.r1cs zkwordo.r1cs.json
 
 # setup plonk verification
-npx snarkjs plonk setup words.r1cs pot14_final.ptau words_plonk.zkey
+npx snarkjs plonk setup zkwordo.r1cs pot14_final.ptau zkwordo_plonk.zkey
 
 # export the verification key
-npx snarkjs zkey export verificationkey words_plonk.zkey verification_key.json
+npx snarkjs zkey export verificationkey zkwordo_plonk.zkey verification_key.json
 
 # export the verifier
-npx snarkjs zkey export solidityverifier words_plonk.zkey ../contracts/PlonkVerifier.sol
+npx snarkjs zkey export solidityverifier zkwordo_plonk.zkey ../contracts/PlonkVerifier.sol
 ```
 
 Then proceed normally.

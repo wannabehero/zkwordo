@@ -17,6 +17,8 @@
     "snarkjs": "^0.6.11"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.8.3"
+    "@openzeppelin/contracts": "^4.8.3",
+    "circomlib": "^2.0.5",
+    "circomlibjs": "^0.1.7"
   }
 }

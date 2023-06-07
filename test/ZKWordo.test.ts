@@ -16,7 +16,7 @@ describe('ZKWordo', function () {
 
     const [signer, another] = await ethers.getSigners();
     const ZKWordo = await ethers.getContractFactory('ZKWordo');
-    const zkWordo = await ZKWordo.deploy(verifier.address, 4);
+    const zkWordo = await ZKWordo.deploy(verifier.address, 4, 0);
 
     return { zkWordo, signer, another };
   }
@@ -78,7 +78,7 @@ describe('ZKWordo', function () {
       const proof = ethers.utils.toUtf8Bytes('test');
 
       await expect(
-        zkWordo.guess(proof, {
+        zkWordo.guess(0, proof, {
           value: ethers.utils.parseEther('0.0001'),
         }),
       ).to.be.revertedWith('ZKWordo: guess price mismatch');
@@ -92,7 +92,7 @@ describe('ZKWordo', function () {
       await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 97 * 60 * 60));
 
       await expect(
-        zkWordo.guess(proof, {
+        zkWordo.guess(0, proof, {
           value: ethers.utils.parseEther('0.01'),
         }),
       ).to.be.revertedWith('ZKWordo: all words guessed');
@@ -103,15 +103,31 @@ describe('ZKWordo', function () {
 
       const proof = ethers.utils.toUtf8Bytes('test');
 
-      await zkWordo.guess(proof, {
+      await zkWordo.guess(0, proof, {
         value: ethers.utils.parseEther('0.01'),
       });
 
       await expect(
-        zkWordo.guess(proof, {
+        zkWordo.guess(1, proof, {
           value: ethers.utils.parseEther('0.01'),
         }),
       ).to.be.revertedWith('ZKWordo: already guessed today');
+    });
+
+    it('Should revert for the same nullifier', async function () {
+      const { zkWordo } = await loadFixture(deployZKWordoFixture);
+
+      const proof = ethers.utils.toUtf8Bytes('test');
+
+      await zkWordo.guess(0, proof, {
+        value: ethers.utils.parseEther('0.01'),
+      });
+
+      await expect(
+        zkWordo.guess(0, proof, {
+          value: ethers.utils.parseEther('0.01'),
+        }),
+      ).to.be.revertedWith('ZKWordo: proof was already used');
     });
   });
 
@@ -121,7 +137,7 @@ describe('ZKWordo', function () {
 
       const proof0 = ethers.utils.toUtf8Bytes('test');
 
-      await zkWordo.guess(proof0, {
+      await zkWordo.guess(0, proof0, {
         value: ethers.utils.parseEther('0.01'),
       });
 
@@ -131,7 +147,7 @@ describe('ZKWordo', function () {
 
       const proof2 = ethers.utils.toUtf8Bytes('test');
 
-      await zkWordo.guess(proof2, {
+      await zkWordo.guess(1, proof2, {
         value: ethers.utils.parseEther('0.01'),
       });
 
@@ -145,7 +161,7 @@ describe('ZKWordo', function () {
       // mock fails for day = 1
       await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 24 * 60 * 60));
 
-      await zkWordo.connect(another).guess(proof, {
+      await zkWordo.connect(another).guess(0, proof, {
         value: ethers.utils.parseEther('0.01'),
       });
 
@@ -160,7 +176,7 @@ describe('ZKWordo', function () {
       const proof = ethers.utils.toUtf8Bytes('test');
 
       await expect(
-        zkWordo.guess(proof, {
+        zkWordo.guess(0, proof, {
           value: ethers.utils.parseEther('0.01'),
         }),
       )
@@ -176,7 +192,7 @@ describe('ZKWordo', function () {
       await time.increaseTo(Math.floor(new Date().getTime() / 1000 + 24 * 60 * 60));
 
       await expect(
-        zkWordo.connect(another).guess(proof, {
+        zkWordo.connect(another).guess(0, proof, {
           value: ethers.utils.parseEther('0.01'),
         }),
       )
@@ -191,7 +207,7 @@ describe('ZKWordo', function () {
 
       const proof = ethers.utils.toUtf8Bytes('test');
 
-      await zkWordo.guess(proof, {
+      await zkWordo.guess(0, proof, {
         value: ethers.utils.parseEther('0.01'),
       });
 

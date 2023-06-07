@@ -1,24 +1,12 @@
-import { ExternalLinkIcon } from '@chakra-ui/icons';
-import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Alert,
-  Box,
-  Highlight,
-  Link,
-  Stack,
-  Text,
-  useToast,
-} from '@chakra-ui/react';
+import { Alert, Stack, useToast } from '@chakra-ui/react';
 import { useAddRecentTransaction } from '@rainbow-me/rainbowkit';
 import { useCallback, useEffect, useState } from 'react';
 import { TransactionExecutionError } from 'viem';
-import { Address, useAccount, useChainId, usePublicClient, useSignTypedData } from 'wagmi';
+import { useAccount, useChainId, usePublicClient, useSignTypedData } from 'wagmi';
 
 import { generateSignedProof } from '../api';
+import { ProofResponse } from '../api/types';
+import Intro from '../components/Intro';
 import Today from '../components/Today';
 import Words from '../components/Words';
 import useHint from '../hooks/useHint';
@@ -34,7 +22,7 @@ import {
 import { createTypedData } from '../web3/signature';
 
 const TodayScreen = () => {
-  const [proof, setProof] = useState<Address>();
+  const [proofResponse, setProofResponse] = useState<ProofResponse>();
   const addRecentTransaction = useAddRecentTransaction();
   const { data: price } = useZkWordoGuessPrice({
     address: ZKWORDO_CONTRACT,
@@ -45,6 +33,7 @@ const TodayScreen = () => {
   const [didGuess, setDidGuess] = useState(false);
   const { address } = useAccount();
   const client = usePublicClient();
+  const [isLoadingProof, setIsLoadingProof] = useState(false);
 
   const {
     write: guess,
@@ -55,7 +44,7 @@ const TodayScreen = () => {
   } = useZkWordoGuess({
     address: ZKWORDO_CONTRACT,
     value: price ?? BigInt(0),
-    args: proof ? [proof] : undefined,
+    args: proofResponse ? [BigInt(proofResponse.nullifierHash), proofResponse.proof] : undefined,
   });
 
   const { data: day } = useZkWordoDay({
@@ -86,6 +75,7 @@ const TodayScreen = () => {
 
   const onGuess = useCallback(
     async (word: string) => {
+      setIsLoadingProof(true);
       try {
         const signature = await signTypedDataAsync(createTypedData({ word, chainId }));
 
@@ -94,7 +84,7 @@ const TodayScreen = () => {
           throw new Error(response.message);
         }
 
-        setProof(response.proof);
+        setProofResponse(response);
 
         return true;
       } catch (err: any) {
@@ -104,18 +94,20 @@ const TodayScreen = () => {
           status: 'error',
         });
         return false;
+      } finally {
+        setIsLoadingProof(false);
       }
     },
-    [signTypedDataAsync, setProof, toast, chainId],
+    [signTypedDataAsync, setProofResponse, setIsLoadingProof, toast, chainId],
   );
 
   useEffect(() => {
-    if (!proof) {
+    if (!proofResponse) {
       return;
     }
     guess();
-    setProof(undefined);
-  }, [proof, guess]);
+    setProofResponse(undefined);
+  }, [proofResponse, setProofResponse, guess]);
 
   useEffect(() => {
     if (!error) {
@@ -148,65 +140,7 @@ const TodayScreen = () => {
 
   return (
     <Stack spacing={4}>
-      <Stack spacing={4}>
-        <Text fontSize="lg">ZKWordo — is a ZKP-based word guessing game.</Text>
-        <Accordion allowToggle>
-          <AccordionItem>
-            <h2>
-              <AccordionButton>
-                <Box as="span" flex="1" textAlign="left">
-                  How it works?
-                </Box>
-                <AccordionIcon />
-              </AccordionButton>
-            </h2>
-            <AccordionPanel pb={4}>
-              <Stack spacing={2}>
-                <Text>
-                  <Highlight query="guess the word" styles={{ px: '1', py: '1', bg: 'teal.300' }}>
-                    Every day there&apos;s a new word to guess. There&apos;s also a hint to help you
-                    guess the word. Words are primarily aroung the crypto and web3 ecosystem.
-                  </Highlight>
-                </Text>
-                <Text>
-                  <Highlight query="sign a message" styles={{ px: '1', py: '1', bg: 'orange.300' }}>
-                    To submit a guess, you need to sign a message with your wallet. This is required
-                    to prove that you&apos;re the one who guessed the word.
-                  </Highlight>
-                </Text>
-                <Text>
-                  <Highlight
-                    query={['ZK proof', 'submit']}
-                    styles={{ px: '1', py: '1', bg: 'red.300' }}
-                  >
-                    If the word is guessed correctly the ZK proof will be generated that you submit
-                    to the smart contract.
-                  </Highlight>
-                </Text>
-                <Text>
-                  <Highlight
-                    query="rewarded with an NFT"
-                    styles={{ px: '1', py: '1', bg: 'green.300' }}
-                  >
-                    If the proof is valid, you&apos;ll be rewarded with an NFT, proving that you
-                    guessed the word.
-                  </Highlight>
-                </Text>
-                <Text>
-                  There&apos;s a <b>symbolic</b> payment required to submit a guess.
-                </Text>
-                <Text>
-                  The project source code is fully{' '}
-                  <Link href="https://github.com/wannabehero/zkwordo">
-                    open-sourced.
-                    <ExternalLinkIcon mx="4px" />
-                  </Link>
-                </Text>
-              </Stack>
-            </AccordionPanel>
-          </AccordionItem>
-        </Accordion>
-      </Stack>
+      <Intro />
       {day && maxWords && day === maxWords ? (
         <Alert status="info" borderRadius="md">
           No more words left to guess this season. Please wait for the next season to start.
@@ -219,7 +153,7 @@ const TodayScreen = () => {
           hint={hint}
           price={price ?? BigInt(0)}
           onGuess={onGuess}
-          isLoading={status === 'loading'}
+          isLoading={status === 'loading' || isLoadingProof}
         />
       )}
       <Words words={words} />
