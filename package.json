@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "wagmi-generate": "wagmi generate -c ./wagmi.config.nest.ts && wagmi generate -c ./wagmi.config.react.ts",
     "test": "hardhat test"
   },
   "author": "",
