@@ -3,6 +3,7 @@ import { ethers } from 'hardhat';
 async function deploy() {
   const Verifier = await ethers.getContractFactory('PlonkVerifier');
   const verifier = await Verifier.deploy();
+  await verifier.deployed();
 
   const ZKWordo = await ethers.getContractFactory('ZKWordo');
   const zkWordo = await ZKWordo.deploy(
@@ -10,7 +11,6 @@ async function deploy() {
     64,
     '2230153193710028632835566707752987226152474453372814143796347740820915755932',
   );
-
   await zkWordo.deployed();
 
   console.log(`zkWordo deployed at ${zkWordo.address}`);
@@ -33,7 +33,7 @@ async function guess() {
   console.log(receipt.logs.map((log) => zkWordo.interface.parseLog(log).name));
 }
 
-guess().catch((error) => {
+deploy().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });

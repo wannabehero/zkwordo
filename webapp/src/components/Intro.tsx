@@ -31,7 +31,7 @@ const Intro = () => {
               <Text>
                 <Highlight query="guess the word" styles={{ px: '1', py: '1', bg: 'teal.300' }}>
                   Every day there&apos;s a new word to guess. There&apos;s also a hint to help you
-                  guess the word. Words are primarily aroung the crypto and web3 ecosystem.
+                  guess the word. Words are primarily around the crypto and web3 ecosystem.
                 </Highlight>
               </Text>
               <Text>

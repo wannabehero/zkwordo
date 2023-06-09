@@ -16,6 +16,7 @@ function App() {
       <RainbowKitProvider
         chains={chains}
         theme={colorMode === 'light' ? lightTheme() : darkTheme()}
+        showRecentTransactions
       >
         <ColorModeScript initialColorMode={theme.config.initialColorMode} />
         <Container className="app">

@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import { TransactionExecutionError } from 'viem';
 import { useAccount, useChainId, usePublicClient, useSignTypedData } from 'wagmi';
+import { WriteContractResult } from 'wagmi/actions';
 
 import { generateSignedProof } from '../api';
 import { ProofResponse } from '../api/types';
@@ -36,11 +37,12 @@ const TodayScreen = () => {
   const { address } = useAccount();
   const client = usePublicClient();
   const [isLoadingProof, setIsLoadingProof] = useState(false);
+  const [isLoadingResult, setIsLoadingResult] = useState(false);
+  const [txInProgress, setTxInProgress] = useState<WriteContractResult>();
 
   const {
-    write: guess,
+    writeAsync: guess,
     status,
-    data: tx,
     error,
     reset,
   } = useZkWordoGuess({
@@ -110,7 +112,7 @@ const TodayScreen = () => {
     if (!proofResponse) {
       return;
     }
-    guess();
+    guess().then(setTxInProgress);
     setProofResponse(undefined);
   }, [proofResponse, setProofResponse, guess]);
 
@@ -127,21 +129,35 @@ const TodayScreen = () => {
   }, [error, reset, toast]);
 
   useEffect(() => {
-    if (!tx) {
+    if (!txInProgress) {
       return;
     }
+    setIsLoadingResult(true);
     addRecentTransaction({
-      hash: tx.hash,
+      hash: txInProgress.hash,
       description: 'Guessing',
     });
-    setDidGuess(true);
-    toast({
-      title: 'Awesome!',
-      description: "You've guessed the today's word and has been rewarded!",
-      status: 'success',
+    client.waitForTransactionReceipt({ hash: txInProgress.hash, confirmations: 2 }).then(() => {
+      setTxInProgress(undefined);
+      setIsLoadingResult(false);
+      setDidGuess(true);
+      toast({
+        title: 'Awesome!',
+        description: "You've guessed the today's word and has been rewarded!",
+        status: 'success',
+      });
+      reset();
     });
-    reset();
-  }, [tx, addRecentTransaction, reset, toast]);
+  }, [
+    txInProgress,
+    addRecentTransaction,
+    setIsLoadingResult,
+    setTxInProgress,
+    setDidGuess,
+    reset,
+    toast,
+    client,
+  ]);
 
   return (
     <Stack spacing={4}>
@@ -158,7 +174,7 @@ const TodayScreen = () => {
           hint={hint}
           price={price ?? BigInt(0)}
           onGuess={onGuess}
-          isLoading={status === 'loading' || isLoadingProof}
+          isLoading={status === 'loading' || isLoadingProof || isLoadingResult}
           nextWordAt={nextWordAtTs ? dayjs.utc(Number(nextWordAtTs) * 1000) : undefined}
         />
       )}

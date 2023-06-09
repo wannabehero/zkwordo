@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "compile": "hardhat compile",
     "wagmi-generate": "wagmi generate -c ./wagmi.config.nest.ts && wagmi generate -c ./wagmi.config.react.ts",
+    "prepare-backend-data": "mkdir -p backend/data && cp data/words.json backend/data/words.json && cp snarks/zkwordo_plonk.zkey backend/data/zkwordo.zkey && cp snarks/zkwordo.wasm backend/data/zkwordo.wasm",
     "test": "hardhat test"
   },
   "author": "",

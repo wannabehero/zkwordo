@@ -24,6 +24,7 @@ WORKDIR /app
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
 COPY assets /app/assets
+COPY data /app/data
 
 RUN apk add --no-cache \
   build-base \
