@@ -16,6 +16,9 @@ contract ZKWordo is ERC1155, Ownable {
     uint256 private immutable _merkleRoot;
     uint256 private _guessPrice = 0.01 ether;
 
+    /// @dev Can be changed for testing purposes
+    uint256 private constant _dayLength = 1 days;
+
     mapping (uint256 => bool) _nullifiers;
 
     IVerifier private _verifier;
@@ -47,7 +50,11 @@ contract ZKWordo is ERC1155, Ownable {
     }
 
     function day() public view returns (uint256) {
-        return (block.timestamp - _createdAt) / 1 days;
+        return (block.timestamp - _createdAt) / _dayLength;
+    }
+
+    function nextWordAt() external view returns (uint256) {
+        return _createdAt + (day() + 1) * _dayLength;
     }
 
     function maxWords() external view returns (uint256) {

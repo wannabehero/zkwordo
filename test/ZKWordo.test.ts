@@ -69,6 +69,15 @@ describe('ZKWordo', function () {
 
       expect(await zkWordo.day()).to.equal(2);
     });
+
+    it('Should calculate when the next word is', async function () {
+      const { zkWordo } = await loadFixture(deployZKWordoFixture);
+
+      expect(await zkWordo.nextWordAt()).to.be.approximately(
+        Math.floor(new Date().getTime() / 1000 + 24 * 60 * 60),
+        100,
+      );
+    });
   });
 
   describe('Validations', function () {

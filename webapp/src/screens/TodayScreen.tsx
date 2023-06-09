@@ -1,5 +1,6 @@
 import { Alert, Stack, useToast } from '@chakra-ui/react';
 import { useAddRecentTransaction } from '@rainbow-me/rainbowkit';
+import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import { TransactionExecutionError } from 'viem';
 import { useAccount, useChainId, usePublicClient, useSignTypedData } from 'wagmi';
@@ -17,6 +18,7 @@ import {
   useZkWordoGuess,
   useZkWordoGuessPrice,
   useZkWordoMaxWords,
+  useZkWordoNextWordAt,
   zkWordoABI,
 } from '../web3/contracts';
 import { createTypedData } from '../web3/signature';
@@ -51,6 +53,9 @@ const TodayScreen = () => {
     address: ZKWORDO_CONTRACT,
   });
   const { data: maxWords } = useZkWordoMaxWords({
+    address: ZKWORDO_CONTRACT,
+  });
+  const { data: nextWordAtTs } = useZkWordoNextWordAt({
     address: ZKWORDO_CONTRACT,
   });
 
@@ -154,6 +159,7 @@ const TodayScreen = () => {
           price={price ?? BigInt(0)}
           onGuess={onGuess}
           isLoading={status === 'loading' || isLoadingProof}
+          nextWordAt={nextWordAtTs ? dayjs.utc(Number(nextWordAtTs) * 1000) : undefined}
         />
       )}
       <Words words={words} />

@@ -1,5 +1,6 @@
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { Alert, Button, HStack, Input, Link, Text, VStack } from '@chakra-ui/react';
+import { Dayjs } from 'dayjs';
 import { useCallback, useState } from 'react';
 import { formatEther } from 'viem';
 import { useWalletClient } from 'wagmi';
@@ -13,11 +14,21 @@ interface TodayProps {
   price: bigint;
   currency: string;
   isLoading?: boolean;
+  nextWordAt?: Dayjs;
 
   onGuess: (word: string) => Promise<boolean>;
 }
 
-const Today = ({ day, hint, price, currency, onGuess, didGuess, isLoading }: TodayProps) => {
+const Today = ({
+  day,
+  hint,
+  price,
+  currency,
+  onGuess,
+  didGuess,
+  isLoading,
+  nextWordAt,
+}: TodayProps) => {
   const [word, setWord] = useState('');
 
   const { data: wallet } = useWalletClient();
@@ -61,9 +72,14 @@ const Today = ({ day, hint, price, currency, onGuess, didGuess, isLoading }: Tod
               Guess
             </Button>
           </HStack>
-          <Text fontSize="xs" alignSelf="flex-end" color="gray.600">
-            Guess price: {formatEther(price)} {currency}
-          </Text>
+          <HStack justifyContent="space-between">
+            <Text fontSize="xs" alignSelf="flex-end" color="gray.600">
+              Next word at: {nextWordAt?.format('D MMM HH:mm') ?? 'N/A'} UTC
+            </Text>
+            <Text fontSize="xs" alignSelf="flex-end" color="gray.600">
+              Guess price: {formatEther(price)} {currency}
+            </Text>
+          </HStack>
         </>
       )}
     </VStack>
