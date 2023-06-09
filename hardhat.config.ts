@@ -2,6 +2,8 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomiclabs/hardhat-etherscan";
 
+const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [];
+
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [
@@ -18,12 +20,12 @@ const config: HardhatUserConfig = {
   },
   networks: {
     zkevm: {
+      accounts,
       url: "https://rpc.public.zkevm-test.net",
-      accounts: [process.env.PRIVATE_KEY!]
     },
     mumbai: {
+      accounts,
       url: "https://rpc.ankr.com/polygon_mumbai",
-      accounts: [process.env.PRIVATE_KEY!]
     },
     local: {
       url: "http://127.0.0.1:8545",
