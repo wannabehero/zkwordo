@@ -136,8 +136,9 @@ const TodayScreen = () => {
     addRecentTransaction({
       hash: txInProgress.hash,
       description: 'Guessing',
+      confirmations: 4,
     });
-    client.waitForTransactionReceipt({ hash: txInProgress.hash, confirmations: 2 }).then(() => {
+    client.waitForTransactionReceipt({ hash: txInProgress.hash, confirmations: 4 }).then(() => {
       setTxInProgress(undefined);
       setIsLoadingResult(false);
       setDidGuess(true);
