@@ -5,7 +5,7 @@ const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
-    <Flex align="baseline">
+    <Flex align="center">
       <Text as="b" fontSize="xl">
         ZKWordo
       </Text>
