@@ -4,6 +4,7 @@ import { ColorModeScript, Container, theme, useColorMode, VStack } from '@chakra
 import { darkTheme, lightTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { WagmiConfig } from 'wagmi';
 
+import Footer from './components/Footer';
 import Header from './components/Header';
 import TodayScreen from './screens/TodayScreen';
 import { chains, wagmiConfig } from './web3/wallet';
@@ -23,6 +24,7 @@ function App() {
           <VStack align="stretch">
             <Header />
             <TodayScreen />
+            <Footer />
           </VStack>
         </Container>
       </RainbowKitProvider>
