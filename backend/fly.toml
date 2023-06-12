@@ -9,7 +9,7 @@ processes = []
 
 [env]
   PORT = "8080"
-  ZK_WORDO_ADDRESS = "0x7457674512759D75D29946C96972a218C70bE079"
+  ZK_WORDO_ADDRESS = "0x4b79635f3cd08c704db30181ca2b4d1415b472da"
   WORDS_PATH = "/app/data/words.json"
   ZK_WASM_PATH = "/app/data/zkwordo.wasm"
   ZK_ZKEY_PATH = "/app/data/zkwordo.zkey"
