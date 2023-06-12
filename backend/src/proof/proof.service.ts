@@ -103,6 +103,8 @@ export class ProofService {
       .split(',')
       .map((x) => BigInt(x));
 
+    this.logger.log(argv);
+
     return {
       proof: params[0],
       nullifierHash: argv[0].toString(),
