@@ -3,7 +3,7 @@ import { useAddRecentTransaction } from '@rainbow-me/rainbowkit';
 import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import { TransactionExecutionError } from 'viem';
-import { useAccount, useChainId, usePublicClient, useSignTypedData } from 'wagmi';
+import { useAccount, useBalance, useChainId, usePublicClient, useSignTypedData } from 'wagmi';
 import { WriteContractResult } from 'wagmi/actions';
 
 import { generateSignedProof } from '../api';
@@ -39,6 +39,7 @@ const TodayScreen = () => {
   const [isLoadingProof, setIsLoadingProof] = useState(false);
   const [isLoadingResult, setIsLoadingResult] = useState(false);
   const [txInProgress, setTxInProgress] = useState<WriteContractResult>();
+  const { refetch: updateBalance } = useBalance({ address });
 
   const {
     writeAsync: guess,
@@ -147,6 +148,7 @@ const TodayScreen = () => {
         description: "You've guessed the today's word and has been rewarded!",
         status: 'success',
       });
+      updateBalance();
       reset();
     });
   }, [
@@ -158,6 +160,7 @@ const TodayScreen = () => {
     reset,
     toast,
     client,
+    updateBalance,
   ]);
 
   return (

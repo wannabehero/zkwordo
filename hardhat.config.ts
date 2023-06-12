@@ -29,7 +29,14 @@ const config: HardhatUserConfig = {
     },
     local: {
       url: "http://127.0.0.1:8545",
-    }
+    },
+    polygon: {
+      accounts,
+      url: "https://polygon-rpc.com",
+    },
+    truffle: {
+      url: "http://localhost:24012/rpc",
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_KEY,
