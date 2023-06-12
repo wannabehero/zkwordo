@@ -6,7 +6,7 @@ import { ZKWORDO_CONTRACT } from '../web3/const';
 
 const Footer = () => (
   <HStack py="16px" spacing="12px" justifyContent="center">
-    <Link target="_blank" href={`https://mumbai.polygonscan.com/address/${ZKWORDO_CONTRACT}`}>
+    <Link target="_blank" href={`https://polygonscan.com/address/${ZKWORDO_CONTRACT}`}>
       <Image src={polygon} alt="Polygon" boxSize="30px" />
     </Link>
     <Link target="_blank" href="https://github.com/wannabehero/zkwordo">
