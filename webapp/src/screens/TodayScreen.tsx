@@ -50,6 +50,7 @@ const TodayScreen = () => {
     address: ZKWORDO_CONTRACT,
     value: price ?? BigInt(0),
     args: proofResponse ? [BigInt(proofResponse.nullifierHash), proofResponse.proof] : undefined,
+    gas: BigInt(500000),
   });
 
   const { data: day } = useZkWordoDay({
