@@ -27,11 +27,11 @@ const connectors = connectorsForWallets([
     groupName: 'Popular',
     wallets: [
       braveWallet({ chains }),
-      metaMaskWallet({ chains }),
-      coinbaseWallet({ appName: 'ZKWordo', chains }),
-      rainbowWallet({ chains }),
+      metaMaskWallet({ chains, projectId: WC_PROJECT_ID, walletConnectVersion: '2' }),
+      coinbaseWallet({ chains, appName: 'ZKWordo' }),
+      rainbowWallet({ chains, projectId: WC_PROJECT_ID, walletConnectVersion: '2' }),
       safeWallet({ chains }),
-      walletConnectWallet({ projectId: WC_PROJECT_ID, chains }),
+      walletConnectWallet({ chains, projectId: WC_PROJECT_ID, version: '2' }),
     ],
   },
 ]);
