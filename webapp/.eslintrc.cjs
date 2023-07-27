@@ -16,7 +16,7 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['react-refresh', '@typescript-eslint', 'simple-import-sort', 'prettier'],
-  ignorePatterns: ['.eslintrc.cjs', 'public/*', 'vite.config.ts', 'dist/*'],
+  ignorePatterns: ['.eslintrc.cjs', 'public/*', 'vite.config.ts', 'dist/*', 'src/web3/contracts.ts'],
   rules: {
     'react/react-in-jsx-scope': 'off',
     'react/require-default-props': 'off',
