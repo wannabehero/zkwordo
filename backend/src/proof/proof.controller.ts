@@ -9,7 +9,12 @@ import { ProofService } from './proof.service';
 export class ProofController {
   constructor(private readonly svc: ProofService) {}
 
-  @Throttle(1, 5)
+  @Throttle({
+    default: {
+      limit: 1,
+      ttl: 5000,
+    },
+  })
   @Post('/generate')
   async generate(@Body() body: { account: string; word: string }) {
     return this.svc.generateProof(body.account, body.word).catch(() => {
@@ -17,7 +22,12 @@ export class ProofController {
     });
   }
 
-  @Throttle(1, 5)
+  @Throttle({
+    default: {
+      limit: 1,
+      ttl: 5000,
+    },
+  })
   @Post('/generate-signed')
   async generateSigned(@Body() body: { word: string; signature: Address }) {
     const { account, word } = await this.svc.extractFromSignature(body.word, body.signature);
