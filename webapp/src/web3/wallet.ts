@@ -4,6 +4,9 @@ import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
   braveWallet,
   coinbaseWallet,
+  frameWallet,
+  injectedWallet,
+  ledgerWallet,
   metaMaskWallet,
   rainbowWallet,
   safeWallet,
@@ -26,6 +29,9 @@ const connectors = connectorsForWallets([
   {
     groupName: 'Popular',
     wallets: [
+      injectedWallet({ chains }),
+      ledgerWallet({ chains, projectId: WC_PROJECT_ID, walletConnectVersion: '2' }),
+      frameWallet({ chains }),
       braveWallet({ chains }),
       metaMaskWallet({ chains, projectId: WC_PROJECT_ID, walletConnectVersion: '2' }),
       coinbaseWallet({ chains, appName: 'ZKWordo' }),

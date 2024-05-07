@@ -14,7 +14,7 @@ contract ZKWordo is ERC1155, Ownable {
     uint256 private immutable _maxWords;
     uint256 private immutable _createdAt;
     uint256 private immutable _merkleRoot;
-    uint256 private _guessPrice = 0.69 ether;
+    uint256 private _guessPrice = 0.00069 ether;
 
     /// @dev Can be changed for testing purposes
     uint256 private constant _dayLength = 1 days;
