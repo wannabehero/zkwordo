@@ -173,7 +173,7 @@ const TodayScreen = () => {
         </Alert>
       ) : (
         <Today
-          currency="MATIC"
+          currency="ETH"
           didGuess={didGuess}
           day={Number(day ?? 0)}
           hint={hint}

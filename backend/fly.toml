@@ -3,13 +3,12 @@
 app = "zkwordo-backend"
 kill_signal = "SIGINT"
 kill_timeout = 5
-mounts = []
 primary_region = "lhr"
 processes = []
 
 [env]
   PORT = "8080"
-  ZK_WORDO_ADDRESS = "0x4b79635f3cd08c704db30181ca2b4d1415b472da"
+  ZK_WORDO_ADDRESS = "0x02a2c1Eab5740eA8660CeBeCc99CB43ed0b1f295"
   WORDS_PATH = "/app/data/words.json"
   ZK_WASM_PATH = "/app/data/zkwordo.wasm"
   ZK_ZKEY_PATH = "/app/data/zkwordo.zkey"

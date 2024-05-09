@@ -37,6 +37,14 @@ const config: HardhatUserConfig = {
     truffle: {
       url: "http://localhost:24012/rpc",
     },
+    "base-sepolia": {
+      accounts,
+      url: "https://sepolia.base.org",
+    },
+    base: {
+      accounts,
+      url: "https://mainnet.base.org",
+    }
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_KEY,
@@ -47,6 +55,22 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://testnet-zkevm.polygonscan.com/api",
           browserURL: "https://testnet-zkevm.polygonscan.com"
+        }
+      },
+      {
+        network: "base-sepolia",
+        chainId: 84532,
+        urls: {
+         apiURL: "https://api-sepolia.basescan.org/api",
+         browserURL: "https://sepolia.basescan.org"
+        }
+      },
+      {
+        network: "base",
+        chainId: 8453,
+        urls: {
+         apiURL: "https://api.basescan.org/api",
+         browserURL: "https://basescan.org"
         }
       }
     ]

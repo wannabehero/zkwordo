@@ -72,7 +72,7 @@ export class ProofService {
     const hashedWords = words.map((word, idx) => hashFunc(word, BigInt(idx)));
     const hashedWord = hashFunc(preparedWord, day);
 
-    const rootAndPath = await calculateMerkleRootAndPath({
+    const { root, pathElements, pathIndices } = calculateMerkleRootAndPath({
       hashFunc,
       levels: 6,
       elements: hashedWords,
@@ -82,11 +82,11 @@ export class ProofService {
     const payload = {
       day,
       nullifier,
-      root: rootAndPath.root,
+      root,
 
+      pathIndices,
+      pathElements,
       word: preparedWord,
-      pathElements: rootAndPath.pathElements,
-      pathIndices: rootAndPath.pathIndices,
     };
 
     const { proof, publicSignals } = await snarkjs.plonk.fullProve(

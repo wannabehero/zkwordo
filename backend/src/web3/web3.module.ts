@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createPublicClient, http } from 'viem';
-import { polygon } from 'viem/chains';
+import { base } from 'viem/chains';
 
 import { VIEM_CLIENT } from './consts';
 
@@ -13,7 +13,7 @@ import { VIEM_CLIENT } from './consts';
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
         createPublicClient({
-          chain: polygon,
+          chain: base,
           transport: http(config.get('RPC_URL')),
         }),
     },

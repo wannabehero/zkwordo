@@ -21,7 +21,7 @@ const Intro = () => {
           <h2>
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
-                How it works?
+                How does it work?
               </Box>
               <AccordionIcon />
             </AccordionButton>
@@ -45,8 +45,8 @@ const Intro = () => {
                   query={['ZK proof', 'submit']}
                   styles={{ px: '1', py: '1', bg: 'red.300' }}
                 >
-                  If the word is guessed correctly the ZK proof will be generated that you submit
-                  the smart contract.
+                  If the word is guessed correctly the ZK proof will be generated that you then
+                  submit to the smart contract.
                 </Highlight>
               </Text>
               <Text>
